@@ -2454,7 +2454,33 @@ pub fn rustdesk_interval(i: Interval) -> ThrottledInterval {
     ThrottledInterval::new(i)
 }
 
+// Aggilli Conecta: servidor, chave e modo de uso embutidos no programa.
+// AGGILLI_MODO=tecnico (na compilacao) gera a versao do tecnico, que tambem conecta em outros.
+const AGGILLI_SERVIDOR: &str = "conecta.aggillintelligence.com.br";
+const AGGILLI_CHAVE: &str = "vwpkyPPk7+Ao3uPtMMtOkfSbEeDRu6VifmvcEzgOIeA=";
+
+fn aplicar_aggilli() {
+    *config::APP_NAME.write().unwrap() = "Aggilli Conecta".to_owned();
+    {
+        let mut s = config::OVERWRITE_SETTINGS.write().unwrap();
+        s.insert("custom-rendezvous-server".to_owned(), AGGILLI_SERVIDOR.to_owned());
+        s.insert("relay-server".to_owned(), AGGILLI_SERVIDOR.to_owned());
+        s.insert("key".to_owned(), AGGILLI_CHAVE.to_owned());
+    }
+    if option_env!("AGGILLI_MODO") != Some("tecnico") {
+        // cliente: so recebe conexoes e cada acesso precisa do clique em Aceitar
+        config::OVERWRITE_SETTINGS
+            .write()
+            .unwrap()
+            .insert("approve-mode".to_owned(), "click".to_owned());
+        let mut h = config::HARD_SETTINGS.write().unwrap();
+        h.insert("conn-type".to_owned(), "incoming".to_owned());
+        h.insert("disable-settings".to_owned(), "Y".to_owned());
+    }
+}
+
 pub fn load_custom_client() {
+    aplicar_aggilli();
     #[cfg(debug_assertions)]
     if let Ok(data) = std::fs::read_to_string("./custom.txt") {
         read_custom_client(data.trim());
