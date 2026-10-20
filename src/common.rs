@@ -2466,6 +2466,8 @@ fn aplicar_aggilli() {
         s.insert("custom-rendezvous-server".to_owned(), AGGILLI_SERVIDOR.to_owned());
         s.insert("relay-server".to_owned(), AGGILLI_SERVIDOR.to_owned());
         s.insert("key".to_owned(), AGGILLI_CHAVE.to_owned());
+        // registro de acessos: o programa avisa inicio, tecnico e fim de cada conexao em /api/audit/conn
+        s.insert("api-server".to_owned(), format!("https://{}", AGGILLI_SERVIDOR));
     }
     if option_env!("AGGILLI_MODO") != Some("tecnico") {
         // cliente: so recebe conexoes e cada acesso precisa do clique em Aceitar
