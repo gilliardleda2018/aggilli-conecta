@@ -133,9 +133,9 @@ jobs:
           path: ./saida
 
       - name: Publish release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
-        with:
-          tag_name: aggilli-conecta
-          name: Aggilli Conecta
-          prerelease: false
-          files: ./saida/*.exe
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view aggilli-conecta -R "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create aggilli-conecta -R "$GITHUB_REPOSITORY" --title "Aggilli Conecta" --notes "Aggilli Conecta"
+          gh release upload aggilli-conecta -R "$GITHUB_REPOSITORY" --clobber ./saida/*.exe
