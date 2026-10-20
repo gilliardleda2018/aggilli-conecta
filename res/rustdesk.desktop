@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=RustDesk
-GenericName=Remote Desktop
-Comment=Remote Desktop
+Name=Aggilli Conecta
+GenericName=Suporte remoto Aggilli
+Comment=Suporte remoto da Aggilli Intelligence
 Exec=rustdesk %u
 Icon=rustdesk
 Terminal=false
@@ -15,5 +15,5 @@ StartupWMClass=rustdesk
 X-Desktop-File-Install-Version=0.23
 
 [Desktop Action new-window]
-Name=Open a New Window
+Name=Abrir nova janela
 Exec=rustdesk %u
