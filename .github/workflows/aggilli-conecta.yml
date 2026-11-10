@@ -4,6 +4,11 @@ name: Aggilli Conecta (Windows)
 
 on:
   workflow_dispatch:
+    inputs:
+      release:
+        description: 'Release de destino (aggilli-conecta = o publicado; outro nome = teste, pre-release)'
+        default: aggilli-conecta-teste
+        required: true
 
 permissions:
   contents: write
@@ -136,6 +141,9 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          REL: ${{ inputs.release }}
         run: |
-          gh release view aggilli-conecta -R "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create aggilli-conecta -R "$GITHUB_REPOSITORY" --title "Aggilli Conecta" --notes "Aggilli Conecta"
-          gh release upload aggilli-conecta -R "$GITHUB_REPOSITORY" --clobber ./saida/*.exe
+          [[ "$REL" =~ ^aggilli-conecta(-[a-z0-9-]{1,30})?$ ]] || { echo "release invalido"; exit 1; }
+          PRE=$([ "$REL" = aggilli-conecta ] || echo --prerelease)
+          gh release view "$REL" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$REL" -R "$GITHUB_REPOSITORY" $PRE --target "$GITHUB_SHA" --title "Aggilli Conecta ($REL)" --notes "Aggilli Conecta"
+          gh release upload "$REL" -R "$GITHUB_REPOSITORY" --clobber ./saida/*.exe

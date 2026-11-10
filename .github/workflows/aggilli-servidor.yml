@@ -1,0 +1,23 @@
+# Testes do servidor da Aggilli no Conecta (aggilli/servidor).
+name: Aggilli Conecta (servidor)
+
+on:
+  pull_request:
+    paths: ['aggilli/servidor/**', '.github/workflows/aggilli-servidor.yml']
+  push:
+    branches: [master]
+    paths: ['aggilli/servidor/**', '.github/workflows/aggilli-servidor.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - run: pip install cryptography==44.0.0
+      - run: python -m unittest aggilli/servidor/test_conecta.py -v
