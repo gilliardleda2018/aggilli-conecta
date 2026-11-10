@@ -2481,6 +2481,29 @@ fn aplicar_aggilli() {
     }
 }
 
+/// Aggilli Conecta (versao do tecnico): antes de cada conexao pergunta ao servidor da Aggilli se o tecnico
+/// esta logado e se a licenca da empresa dele vale (Conecta · Clientes no Controle). Sem login, licenca vencida
+/// ou cancelada, ou sem resposta do servidor, a conexao nao comeca.
+pub async fn aggilli_autorizar() -> ResultType<()> {
+    let token = config::LocalConfig::get_option("access_token");
+    if token.is_empty() {
+        bail!("Aggilli Conecta: entre com o seu usuário de técnico (Configurações > Conta > Entrar) antes de conectar.");
+    }
+    let url = format!("https://{}/api/aggilli/autorizar", AGGILLI_SERVIDOR);
+    let body = json!({ "id": config::Config::get_id() }).to_string();
+    let (status, texto) = post_request_with_status(url, body, &format!("Authorization: Bearer {}", token))
+        .await
+        .map_err(|_| anyhow!("Aggilli Conecta: sem contato com o servidor da Aggilli. Confira a internet e tente de novo."))?;
+    if status == 200 {
+        return Ok(());
+    }
+    let msg = serde_json::from_str::<Value>(&texto)
+        .ok()
+        .and_then(|v| v["error"].as_str().map(|s| s.to_owned()))
+        .unwrap_or_else(|| format!("Aggilli Conecta: acesso não autorizado (HTTP {}).", status));
+    bail!(msg)
+}
+
 pub fn load_custom_client() {
     aplicar_aggilli();
     #[cfg(debug_assertions)]

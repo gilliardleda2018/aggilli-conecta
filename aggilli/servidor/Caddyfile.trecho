@@ -1,0 +1,13 @@
+	# Conecta · Clientes: só o servidor do Controle chega na rota assinada (a assinatura Ed25519 é a segunda trava).
+	# Entra no Caddyfile de /opt/caddy, ANTES do bloco "handle /api/*".
+	@controle_rota path /api/aggilli/controle
+	handle @controle_rota {
+		@do_controle remote_ip 184.192.102.90
+		handle @do_controle {
+			request_body {
+				max_size 16KB
+			}
+			reverse_proxy 127.0.0.1:8070
+		}
+		respond 403
+	}
